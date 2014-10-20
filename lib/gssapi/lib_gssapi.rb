@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 =begin
 Copyright © 2010 Dan Wanek <dan.wanek@gmail.com>
 
@@ -179,7 +180,7 @@ module GSSAPI
     class GssCtxIdT < GssPointer
       def self.release_ptr(context_ptr)
         min_stat = FFI::MemoryPointer.new :OM_uint32
-        maj_stat = LibGSSAPI.gss_delete_sec_context(min_stat, context_ptr, LibGSSAPI::GSS_C_NO_BUFFER)
+        maj_stat = LibGSSAPI.gss_delete_sec_context(min_stat, context_ptr, LibGSSAPI::GSS_C_NO_BUFFER) unless /darwin/ =~ RUBY_PLATFORM
       end
 
       def self.gss_c_no_context
@@ -270,7 +271,7 @@ module GSSAPI
     #   min_stat = FFI::MemoryPointer.new :OM_uint32
     # Remember to free the allocated output_message_buffer with gss_release_buffer
     attach_function :gss_wrap, [:pointer, :pointer, :int, :OM_uint32, :pointer, :pointer, :pointer], :OM_uint32
-    
+
     # Some versions of GSSAPI might not have support for IOV yet.
     begin
       # OM_uint32 GSSAPI_LIB_FUNCTION gss_wrap_iov( OM_uint32 * minor_status, gss_ctx_id_t  context_handle,
@@ -287,7 +288,7 @@ module GSSAPI
     rescue FFI::NotFoundError => ex
       warn "WARNING: Could not load IOV methods. Check your GSSAPI C library for an update"
     end
-    
+
     begin
       # OM_uint32 gss_wrap_aead(OM_uint32 * minor_status, gss_ctx_id_t context_handle, int conf_req_flag,
       #   gss_qop_t qop_req, gss_buffer_t input_assoc_buffer,
